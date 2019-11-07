@@ -20,6 +20,7 @@ module VagrantPlugins
 
         def initialize(app, env)
           @app = app
+          @env = env
           @logger = Log4r::Logger.new("vagrant_azure::action::run_instance")
         end
 
@@ -121,9 +122,12 @@ module VagrantPlugins
             image_sku:                      image_sku,
             image_version:                  image_version,
             vhd_uri:                        vm_vhd_uri,
+            vm_managed_image_id:            vm_managed_image_id,
             operating_system:               operating_system,
             data_disks:                     config.data_disks
           }
+
+          env[:ui].info(" -- data_disks: #{config.data_disks.map { |x| x['name'] }}")
 
           if operating_system != "Windows"
             private_key_paths = machine.config.ssh.private_key_path

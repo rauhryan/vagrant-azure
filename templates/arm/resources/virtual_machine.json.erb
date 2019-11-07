@@ -59,12 +59,30 @@
         "createOption": "fromImage",
         "caching": "ReadWrite"
       },
+
+      <% if image_publisher == 'microsoft-dsvm' %>
+      "copy": [
+        {
+          "name": "dataDisks",
+          "count": 1,
+          "input": {
+            "lun": "0",
+            "createOption": "fromImage",
+            "caching": "ReadOnly",
+            "managedDisk": {
+              "storageAccountType": "<%= storage_account_type %>"
+            }
+          }
+        }
+      ]
+      <% else %>
       "dataDisks" : [
         <%= data_disks.each_with_index.map { |disk, idx|
             VagrantPlugins::Azure::Util::TemplateRenderer.render("arm/resources/data_disk.json", {lun: idx + 2}.merge(disk))
           }.join(", ")
         %>
       ]
+      <% end %>
     },
     "networkProfile": {
       "networkInterfaces": [
